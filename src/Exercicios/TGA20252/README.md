@@ -17,7 +17,7 @@ Trabalho desenvolvido para a disciplina **Processamento Gráfico: Fundamentos**.
 > **As configurações de ambiente são necessárias para seguir com a execução!**
 > - No diretório raíz do projeto `PG2025-2\`, utilize o terminal para navegar até o diretório `build` com o comando: `cd .\build\`
 > - Depois, faça o build do projeto com o comando: `cmake --build .`
-> - Assim que finalizar o build, é só executar os programas. Por exemplo, use o comando: `.\L1Ex5a.exe`
+> - Assim que finalizar o build, é só executar o programa. Use o comando: `.\tga20252.exe`
 > - O programa ficará executando em uma janela externa até ser fechado.
 
 ## 🕹️ Como jogar
@@ -25,4 +25,5 @@ Trabalho desenvolvido para a disciplina **Processamento Gráfico: Fundamentos**.
 > - Para se mover, use as teclas `←` e `→` ou `a` e `d` para se mover à esquerda ou direita respectivamente;  
 > - Para disparar, use a tecla `SPACE`;  
 > - Se acabar as 3 vidas, reinicie o jogo com a tecla `ENTER`;  
+
 > - Para fechar, use a tecla `ESC`.  
