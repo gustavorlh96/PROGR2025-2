@@ -60,6 +60,7 @@ set(EXERCISES
     Exercicios/Lista2/L2Ex4
     Exercicios/Lista2/L2Ex5
     Exercicios/Lista2/L2Ex6
+    Exercicios/TGA20252
 )
 
 add_compile_options(-Wno-pragmas)
