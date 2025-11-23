@@ -1,12 +1,23 @@
 cmake_minimum_required(VERSION 3.11)
 project(PG2025-2)
 
-# Define o padrão do C++
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Ativa o FetchContent
 include(FetchContent)
+
+# Define as bibliotecas para cada sistema operacional
+if(WIN32)
+    set(OPENGL_LIBS opengl32)
+elseif(APPLE)
+    find_library(OpenGL_LIBRARY OpenGL)
+    set(OPENGL_LIBS ${OpenGL_LIBRARY})
+else()
+    find_package(OpenGL REQUIRED)
+    set(OPENGL_LIBS ${OPENGL_gl_LIBRARY})
+endif()
 
 # Configura o FetchContent para baixar e compilar GLFW automaticamente
 FetchContent_Declare(
@@ -30,6 +41,30 @@ FetchContent_Declare(
   GIT_TAG master
 )
 FetchContent_MakeAvailable(stb_image)
+
+# Configura o FetchContent para baixar o Dear ImGui automaticamente
+FetchContent_Declare(
+  imgui
+  GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  GIT_TAG docking  # Using docking branch for latest features
+)
+FetchContent_MakeAvailable(imgui)
+
+# Create ImGui library with GLFW and OpenGL3 backends
+add_library(imgui_impl STATIC
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+)
+target_include_directories(imgui_impl PUBLIC
+    ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
+)
+target_link_libraries(imgui_impl PUBLIC glfw ${OPENGL_LIBS})
 
 # Adiciona as pastas de cabeçalhos
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -61,20 +96,10 @@ set(EXERCISES
     Exercicios/Lista2/L2Ex5
     Exercicios/Lista2/L2Ex6
     Exercicios/TGA20252
+    Exercicios/TGB20252
 )
 
 add_compile_options(-Wno-pragmas)
-
-# Define as bibliotecas para cada sistema operacional
-if(WIN32)
-    set(OPENGL_LIBS opengl32)
-elseif(APPLE)
-    find_library(OpenGL_LIBRARY OpenGL)
-    set(OPENGL_LIBS ${OpenGL_LIBRARY})
-else()
-    find_package(OpenGL REQUIRED)
-    set(OPENGL_LIBS ${OPENGL_gl_LIBRARY})
-endif()
 
 # Caminho esperado para a GLAD
 set(GLAD_C_FILE "${CMAKE_SOURCE_DIR}/common/glad.c")
@@ -92,7 +117,14 @@ foreach(EXERCISE ${EXERCISES})
     get_filename_component(EXE_NAME ${EXERCISE} NAME)
 
     # Coleta todos os .cpp dentro do diretório do exercício
-    file(GLOB EXE_SOURCES src/${EXERCISE}/*.cpp)
+    # FIXED: Add 'src/' prefix to find the actual source files
+    file(GLOB EXE_SOURCES ${CMAKE_SOURCE_DIR}/src/${EXERCISE}/*.cpp)
+    
+    # Debug: print if no sources found
+    if(NOT EXE_SOURCES)
+        message(WARNING "No .cpp files found for ${EXE_NAME} in ${CMAKE_SOURCE_DIR}/src/${EXERCISE}")
+        continue()
+    endif()
 
     # Cria o executável com todos os .cpp + glad.c
     add_executable(${EXE_NAME} ${EXE_SOURCES} ${GLAD_C_FILE})
@@ -100,6 +132,20 @@ foreach(EXERCISE ${EXERCISES})
     # Configura includes e bibliotecas
     target_include_directories(${EXE_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include/glad ${glm_SOURCE_DIR} ${stb_image_SOURCE_DIR})
 
-
     target_link_libraries(${EXE_NAME} glfw ${OPENGL_LIBS} glm::glm )
+    
+    if(${EXE_NAME} STREQUAL "TGB20252")
+        find_package(OpenCV QUIET)
+        if(OpenCV_FOUND)
+            target_include_directories(${EXE_NAME} PRIVATE ${OpenCV_INCLUDE_DIRS})
+            target_link_libraries(${EXE_NAME} ${OpenCV_LIBS})
+            message(STATUS "OpenCV found for TGB20252: ${OpenCV_VERSION}")
+        else()
+            message(WARNING "OpenCV not found. TGB20252 may not build correctly. Install OpenCV or set OpenCV_DIR.")
+        endif()
+        
+        # Link ImGui for TGB20252
+        target_link_libraries(${EXE_NAME} imgui_impl)
+        target_include_directories(${EXE_NAME} PRIVATE ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
+    endif()
 endforeach()
