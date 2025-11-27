@@ -17,7 +17,7 @@ Trabalho desenvolvido para a disciplina **Processamento Gráfico: Fundamentos**.
 
 ### 📋 Pré-requisitos
 
-#### Bibliotecas necessárias:
+#### Pre-steps / Bibliotecas necessárias:
 - **Pasta `videos` dentro de assets** - Baixe o arquivo `videos.zip` nos arquivos da entrega no moodle e descompacte dentro do diretório `assets`. O caminho para o vídeo deve ser `PG2025-2\assets\videos\camera_video.mp4`. Infelizmente ele não se encontra nesse repositório devido ao limite de arquivos de no máximo 25mb do GitHub.
 - **OpenGL** - Para renderização gráfica
 - **GLFW** - Para gerenciamento de janelas e eventos (baixado automaticamente via CMake)
@@ -221,4 +221,5 @@ O projeto explora diversos conceitos fundamentais:
 ## 🎮 Isso é tudo!
 
 _"The right code in the wrong place can make all the difference in the world."_ **— Adaptado de Half-Life 2**
+
 
